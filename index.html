@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ANONYMOUS SNAP LOOKUP</title>
+    <!-- On importe une police "Cyber" sur Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --an-violet: #8A2BE2;
+            --an-blue: #00FFFF;
+            --an-gold: #FFD700;
+            --bg-dark: #050011;
+        }
+
+        body, html {
+            height: 100%;
+            margin: 0;
+            background-color: var(--bg-dark);
+            font-family: 'Orbitron', sans-serif;
+            color: white;
+            overflow: hidden; /* Pour garder le look "screen" */
+        }
+
+        /* Arrière-plan "Grille Hacker" */
+        .grid-overlay {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(0deg, transparent 95%, rgba(138, 43, 226, 0.3) 100%);
+            z-index: 1;
+        }
+
+        /* Container Principal */
+        .main-container {
+            width: 90%;
+            height: 90%;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* -- LE LOGO ANONYMOUS -- */
+        .logo-circle {
+            width: 100px;
+            height: 100px;
+            border: 2px solid var(--an-violet);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            box-shadow: 0 0 20px rgba(138, 43, 226, 0.6);
+            animation: pulse 2s infinite;
+        }
+        
+        /* Le motif de points du logo */
+        .logo-circle::before {
+            content: '';
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 5px;
+            opacity: 0.8;
+        }
+
+        /* -- LA ZONE CENTRALE (Nom) -- */
+        .search-area {
+            text-align: left;
+            margin-right: 50px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.2rem;
+            color: var(--an-blue);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: absolute;
+            top: 10px;
+        }
+
+        .input-bar {
+            width: 350px;
+            margin-top: 25px;
+            position: relative;
+        }
+
+        input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--an-blue);
+            padding: 15px;
+            font-family: 'Orbitron', monospace;
+            color: white;
+            font-size: 1.1rem;
+            outline: none;
+            transition: 0.3s;
+            letter-spacing: 1px;
+        }
+
+        input:focus {
+            background: rgba(0, 255, 255, 0.1);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
+            border-color: var(--an-gold);
+        }
+
+        /* -- L'OUTPUT (L'ID) -- */
+        .output-area {
+            text-align: right;
+            position: absolute;
+            right: 80px;
+            text-align: right;
+        }
+
+        .target-label {
+            font-size: 0.9rem;
+            color: var(--an-gold);
+            margin-bottom: 5px;
+            opacity: 0; /* Caché par défaut */
+            transition: opacity 0.5s;
+        }
+
+        #snap-id {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #fff;
+            text-shadow: 2px 2px 0px var(--an-violet);
+            opacity: 0;
+            transition: 0.5s;
+            line-height: 1;
+        }
+
+        /* -- ANIMATIONS -- */
+        @keyframes pulse {
+            0% { box-shadow: 0 0 10px var(--an-violet); }
+            50% { box-shadow: 0 0 25px var(--an-violet); }
+            100% { box-shadow: 0 0 10px var(--an-violet); }
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        /* Classe JS pour activer les animations */
+        .active {
+            animation: popIn 0.5s ease-out forwards;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Fond Grille -->
+    <div class="grid-overlay"></div>
+
+    <div class="main-container">
+        
+        <!-- On gauche : Logo + Cadre -->
+        <div class="logo-circle">
+            <svg width="40" height="40" viewBox="0 0 100 100">
+                <!-- Motif tirets si on veux etre gerege -->
+                <rect x="25" y="25" width="50" height="50" stroke="white" fill="transparent"/>
+            </svg>
+        </div>
+
+        <!-- Milieu : La Barre de Recherche -->
+        <div class="search-area">
+            <h1>Snap Lookup</h1>
+            <div class="input-bar">
+                <input type="text" id="userInput" placeholder="ENTER SNAP_ID" autocomplete="off">
+            </div>
+            <p style="font-size: 0.8rem; color: rgba(255,255,255,0.5); letter-spacing: 2px; margin-top:0;">RECEIVE + TARGET</p>
+        </div>
+
+        <!-- A droite : Le Résultat de l'ID -->
+        <div class="output-area">
+            <div id="label">THE ID</div>
+            <div id="snap-id">SNAP_01</div>
+        </div>
+
+    </div>
+
+    <script>
+        const input = document.getElementById('userInput');
+        const targetLabel = document.getElementById('label');
+        const snapDisplay = document.getElementById('snap-id');
+
+        // Fonction pour simuler la "Framie" ou le résultat
+        input.addEventListener('keyup', (e) => {
+            if(input.value.length > 2) {
+                targetLabel.classList.add('active'); // Faire apparaître le label
+                snapDisplay.classList.add('active'); // Faire apparaître l'ID
+                
+                // Logique magique : Si on met "Ana", l'ID deviens ANA12
+                // Sinon on prend les 2 premières lettres + un chiffre
+                let name = input.value;
+                let code = "S" + name.charAt(0).toUpperCase() + (name.length - 1);
+                
+                snapDisplay.innerText = `ID: ${code}`;
+            } else {
+                // Si on a retacé le tout, on remet l'ID baseline
+                snapDisplay.classList.remove('active');
+                snapDisplay.innerText = `ID: ${input.value}`;
+            }
+        });
+
+       
